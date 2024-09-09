@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 
 # Load the pre-trained machine learning model
-model_path = "/model_ML/data/model_ML.pkl"
+model_path = "/mnt/data/model_ML.pkl"
 with open(model_path, 'rb') as model_file:
     model = pickle.load(model_file)
 
