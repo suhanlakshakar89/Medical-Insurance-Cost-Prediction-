@@ -1,32 +1,15 @@
-from flask import Flask, request, render_template
+import streamlit as st
 import pickle
 import numpy as np
 
 # Load the machine learning model
-model_path = "model_ML_2.pkl" 
+model_path = 'model_ML_2.pkl'  # Change this path to the actual path of your model file
 with open(model_path, 'rb') as file:
     model = pickle.load(file)
 
-# Initialize the Flask application
-app = Flask(__name__)
-
-# Home route to display the web page
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-# Predict route to handle form submission
-@app.route('/predict', methods=['POST'])
-def predict():
-    # Retrieve data from form
-    age = int(request.form['age'])
-    bmi = float(request.form['bmi'])
-    children = int(request.form['children'])
-    region = request.form['region']
-    sex = request.form['sex']
-    smoker = request.form['smoker']
-
-    # Convert categorical variables to numerical format if necessary
+# Define a function for prediction
+def predict_insurance_cost(age, bmi, children, region, sex, smoker):
+    # Convert categorical variables to numerical format
     region_map = {'southwest': 0, 'southeast': 1, 'northwest': 2, 'northeast': 3}
     sex_map = {'male': 0, 'female': 1}
     smoker_map = {'yes': 1, 'no': 0}
@@ -40,10 +23,20 @@ def predict():
 
     # Make prediction
     prediction = model.predict(input_features)
-    predicted_cost = round(prediction[0], 2)
+    return round(prediction[0], 2)
 
-    return render_template('index.html', prediction_text=f'Predicted Medical Insurance Cost: ₹{predicted_cost}')
+# Streamlit app
+st.title('Medical Insurance Cost Prediction')
 
-# Run the application
-if __name__ == '__main__':
-    app.run(debug=True)
+# Input fields
+age = st.number_input('Age', min_value=0, max_value=100, value=30)
+bmi = st.number_input('BMI', min_value=0.0, max_value=100.0, value=25.0)
+children = st.number_input('Number of Children', min_value=0, max_value=10, value=0)
+region = st.selectbox('Region', ('southwest', 'southeast', 'northwest', 'northeast'))
+sex = st.selectbox('Sex', ('male', 'female'))
+smoker = st.selectbox('Smoker', ('yes', 'no'))
+
+# Prediction button
+if st.button('Predict'):
+    predicted_cost = predict_insurance_cost(age, bmi, children, region, sex, smoker)
+    st.success(f'Predicted Medical Insurance Cost: ₹{predicted_cost}')
