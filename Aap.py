@@ -21,8 +21,17 @@ def predict_insurance_cost(age, bmi, children, region, sex, smoker):
     # Create input array for prediction
     input_features = np.array([[age, bmi, children, region_num, sex_num, smoker_num]])
 
+    # Ensure there are no missing or NaN values
+    if np.isnan(input_features).any():
+        raise ValueError("Input features contain NaN values. Please check the inputs.")
+
     # Make prediction
-    prediction = model.predict(input_features)
+    try:
+        prediction = model.predict(input_features)
+    except Exception as e:
+        st.error(f"An error occurred during prediction: {e}")
+        return None
+
     return round(prediction[0], 2)
 
 # Streamlit app
@@ -38,5 +47,11 @@ smoker = st.selectbox('Smoker', ('yes', 'no'))
 
 # Prediction button
 if st.button('Predict'):
-    predicted_cost = predict_insurance_cost(age, bmi, children, region, sex, smoker)
-    st.success(f'Predicted Medical Insurance Cost: ₹{predicted_cost}')
+    try:
+        predicted_cost = predict_insurance_cost(age, bmi, children, region, sex, smoker)
+        if predicted_cost is not None:
+            st.success(f'Predicted Medical Insurance Cost: ₹{predicted_cost}')
+    except ValueError as ve:
+        st.error(f"Input error: {ve}")
+    except Exception as e:
+        st.error(f"An unexpected error occurred: {e}")
