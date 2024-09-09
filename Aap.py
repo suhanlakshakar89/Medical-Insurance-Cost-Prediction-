@@ -1,53 +1,49 @@
-import streamlit as st
+from flask import Flask, request, render_template
 import pickle
 import numpy as np
 
-# Load the pre-trained machine learning model
-model_path = "model_ML.pkl"
-with open(model_path, 'rb') as model_file:
-    model = pickle.load(model_file)
+# Load the machine learning model
+model_path = "model_ML_2.pkl" 
+with open(model_path, 'rb') as file:
+    model = pickle.load(file)
 
-# Function to predict insurance cost
-def predict_cost(age, bmi, children, region, sex, smoker):
-    # Convert categorical data to numeric
-    sex = 1 if sex == 'Male' else 0
-    smoker = 1 if smoker == 'Yes' else 0
+# Initialize the Flask application
+app = Flask(__name__)
 
-    # Region encoding (example - match your model's encoding)
-    regions = {'Southwest': 0, 'Southeast': 1, 'Northwest': 2, 'Northeast': 3}
-    region = regions[region]
+# Home route to display the web page
+@app.route('/')
+def home():
+    return render_template('index.html')
 
-    # Prepare the features for the model
-    features = np.array([[age, bmi, children, region, sex, smoker]])
+# Predict route to handle form submission
+@app.route('/predict', methods=['POST'])
+def predict():
+    # Retrieve data from form
+    age = int(request.form['age'])
+    bmi = float(request.form['bmi'])
+    children = int(request.form['children'])
+    region = request.form['region']
+    sex = request.form['sex']
+    smoker = request.form['smoker']
 
-    # Debugging: print feature shape
-    st.write("Input Features Shape:", features.shape)
-    st.write("Input Features:", features)
+    # Convert categorical variables to numerical format if necessary
+    region_map = {'southwest': 0, 'southeast': 1, 'northwest': 2, 'northeast': 3}
+    sex_map = {'male': 0, 'female': 1}
+    smoker_map = {'yes': 1, 'no': 0}
 
-    # Make a prediction using the model
-    prediction = model.predict(features)
-    return prediction[0]
+    region_num = region_map.get(region.lower(), 0)
+    sex_num = sex_map.get(sex.lower(), 0)
+    smoker_num = smoker_map.get(smoker.lower(), 0)
 
-# Streamlit app code
-st.title("Medical Insurance Cost Prediction (in INR)")
+    # Create input array for prediction
+    input_features = np.array([[age, bmi, children, region_num, sex_num, smoker_num]])
 
-# Create form inputs
-age = st.number_input("Age", min_value=18, max_value=100, value=25)
-bmi = st.number_input("BMI", min_value=10.0, max_value=50.0, value=25.0)
-children = st.number_input("Number of Children", min_value=0, max_value=10, value=0)
-region = st.selectbox("Region", ["Southwest", "Southeast", "Northwest", "Northeast"])
-sex = st.selectbox("Sex", ["Male", "Female"])
-smoker = st.selectbox("Smoker", ["Yes", "No"])
+    # Make prediction
+    prediction = model.predict(input_features)
+    predicted_cost = round(prediction[0], 2)
 
-# Button to make predictions
-if st.button("Predict"):
-    try:
-        prediction = predict_cost(age, bmi, children, region, sex, smoker)
+    return render_template('index.html', prediction_text=f'Predicted Medical Insurance Cost: ₹{predicted_cost}')
 
-        # Convert prediction from USD to INR (assuming 1 USD = 83 INR)
-        prediction_inr = prediction * 83
-
-        # Display the result in INR
-        st.success(f"The predicted medical insurance cost is ₹{round(prediction_inr, 2)}")
-    except Exception as e:
-        st.error(f"Error in prediction: {e}")
+# Run the application
+if __name__ == '__main__':
+    app.run(debug=True)
