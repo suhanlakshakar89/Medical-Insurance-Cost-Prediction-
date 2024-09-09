@@ -25,7 +25,7 @@ def predict_cost(age, bmi, children, region, sex, smoker):
     return prediction[0]
 
 # Streamlit app code
-st.title("Medical Insurance Cost Prediction")
+st.title("Medical Insurance Cost Prediction (in INR)")
 
 # Create form inputs
 age = st.number_input("Age", min_value=18, max_value=100, value=25)
@@ -38,4 +38,9 @@ smoker = st.selectbox("Smoker", ["Yes", "No"])
 # Button to make predictions
 if st.button("Predict"):
     prediction = predict_cost(age, bmi, children, region, sex, smoker)
-    st.success(f"The predicted medical insurance cost is ${round(prediction, 2)}")
+
+    # Convert prediction from USD to INR (assuming 1 USD = 83 INR)
+    prediction_inr = prediction * 83
+
+    # Display the result in INR
+    st.success(f"The predicted medical insurance cost is ₹{round(prediction_inr, 2)}")
