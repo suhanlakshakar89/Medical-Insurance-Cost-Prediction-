@@ -4,7 +4,7 @@ import numpy as np
 
 # Load the pre-trained machine learning model
 model_path = "model_ML.pkl"
-with open(model_path.pkl, 'rb') as model_file:
+with open(model_path, 'rb') as model_file:
     model = pickle.load(model_file)
 
 # Function to predict insurance cost
