@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 
 # Load the pre-trained machine learning model
-model_path = "model_ML_2.pkl"
+model_path = "model_ML.pkl"
 with open(model_path, 'rb') as model_file:
     model = pickle.load(model_file)
 
@@ -19,6 +19,10 @@ def predict_cost(age, bmi, children, region, sex, smoker):
 
     # Prepare the features for the model
     features = np.array([[age, bmi, children, region, sex, smoker]])
+
+    # Debugging: print feature shape
+    st.write("Input Features Shape:", features.shape)
+    st.write("Input Features:", features)
 
     # Make a prediction using the model
     prediction = model.predict(features)
@@ -37,10 +41,13 @@ smoker = st.selectbox("Smoker", ["Yes", "No"])
 
 # Button to make predictions
 if st.button("Predict"):
-    prediction = predict_cost(age, bmi, children, region, sex, smoker)
+    try:
+        prediction = predict_cost(age, bmi, children, region, sex, smoker)
 
-    # Convert prediction from USD to INR (assuming 1 USD = 83 INR)
-    prediction_inr = prediction * 83
+        # Convert prediction from USD to INR (assuming 1 USD = 83 INR)
+        prediction_inr = prediction * 83
 
-    # Display the result in INR
-    st.success(f"The predicted medical insurance cost is ₹{round(prediction_inr, 2)}")
+        # Display the result in INR
+        st.success(f"The predicted medical insurance cost is ₹{round(prediction_inr, 2)}")
+    except Exception as e:
+        st.error(f"Error in prediction: {e}")
