@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 
 # Load the machine learning model
-model_path = 'model_ML_2.pkl'  # Change this path to the actual path of your model file
+model_path = 'model_Medical.pkl'  # Change this path to the actual path of your model file
 with open(model_path, 'rb') as file:
     model = pickle.load(file)
 
