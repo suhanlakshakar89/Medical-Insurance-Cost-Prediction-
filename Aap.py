@@ -39,10 +39,10 @@ st.title('Medical Insurance Cost Prediction')
 
 # Input fields
 age = st.number_input('Age', min_value=0, max_value=100, value=30)
-bmi = st.number_input('BMI', min_value=0.0, max_value=100.0, value=25.0)
-children = st.number_input('Number of Children', min_value=0, max_value=10, value=0)
-region = st.selectbox('Region', ('southwest', 'southeast', 'northwest', 'northeast'))
-sex = st.selectbox('Sex', ('male', 'female'))
+bmi = st.number_input('BMI', min_value=0.0, max_value=100.0, value=28.0)
+children = st.number_input('Number of Children', min_value=0, max_value=10, value=2)
+region = st.selectbox('Region', ('northwest',  'northeast','southwest', 'southeast'))
+sex = st.selectbox('Sex', ('female', 'male'))
 smoker = st.selectbox('Smoker', ('yes', 'no'))
 
 # Prediction button
